@@ -66,6 +66,7 @@ func SeedMockData() {
 		Prerequisites: "Go, React, PostgreSQL",
 		DateDebut:     dateDebut,
 		DateFin:       dateFin,
+		IDEncadrant:   encadrant.ID,
 		Duree:         60,
 		EstActif:      true,
 	}
@@ -84,7 +85,7 @@ func SeedMockData() {
 	stage := models.Stage{
 		StatutStage:    "en_cours",
 		DateValidation: func() *time.Time { t := time.Now(); return &t }(),
-		IDEncadrant:    encadrant.ID,
+
 		IDAssistante:   assistante.ID,
 		IDDemandeStage: demande.ID,
 	}

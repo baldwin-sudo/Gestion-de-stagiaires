@@ -47,6 +47,7 @@ func CreateStage() gin.HandlerFunc {
 			Description   string `form:"description" binding:"required"`
 			Prerequisites string `form:"prerequisites" binding:"required"`
 			Duree         string `form:"duree" binding:"required"`
+			IDEncadrant   string `form:"id_encadrant" binding:"required"`
 		}
 		var createRequest CreateThemeStageRequest
 		if err := c.ShouldBind(&createRequest); err != nil {
@@ -69,7 +70,11 @@ func CreateStage() gin.HandlerFunc {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid finish date format. Use YYYY-MM-DD"})
 			return
 		}
-
+		id_encadrant, err := strconv.Atoi(createRequest.IDEncadrant)
+		if err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid duree number"})
+			return
+		}
 		themeStage := models.ThemeDeStage{
 			Sujet:         createRequest.Sujet,
 			Departement:   createRequest.Departement,
@@ -79,8 +84,10 @@ func CreateStage() gin.HandlerFunc {
 			Duree:         duree,
 			DateDebut:     dateDebut,
 			DateFin:       dateFin,
+			IDEncadrant:   uint(id_encadrant),
 			EstActif:      false,
 		}
+
 		db := database.DB
 
 		if result := db.Create(&themeStage); result.Error != nil {
