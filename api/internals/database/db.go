@@ -1,11 +1,12 @@
 package database
 
 import (
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 	"log"
 	"os"
 	"project-stage-pfa/internals/models"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
@@ -34,7 +35,7 @@ func ConnectDB() {
 
 	// Migration automatique des modèles
 	err = db.AutoMigrate(
-		&models.Utilisateur{},
+
 		&models.Stagiaire{},
 		&models.AssistanteChargeStage{},
 		&models.DemandeStage{},

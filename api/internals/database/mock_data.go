@@ -7,37 +7,22 @@ import (
 )
 
 func SeedMockData() {
-	// 1. Utilisateurs
-	stagiaireUser := models.Utilisateur{
-		Identifiant:  "stagiaire1",
-		HashPassword: "hashed_password1",
-		Role:         "stagiaire",
-	}
-
-	assistanteUser := models.Utilisateur{
-		Identifiant:  "assistante1",
-		HashPassword: "hashed_password2",
-		Role:         "assistante",
-	}
-
-	DB.Create(&stagiaireUser)
-	DB.Create(&assistanteUser)
-
-	// 2. Stagiaire & Assistante
+	// 1. Stagiaire & Assistante
 	stagiaire := models.Stagiaire{
-		Nom:           "Kasmi",
-		Prenom:        "El Mehdi",
-		Ecole:         "ENSAM Rabat",
-		Specialite:    "Data Science",
-		IDUtilisateur: stagiaireUser.ID,
+		Nom:    "Kasmi",
+		Prenom: "El Mehdi",
+
+		Ecole:      "ENSAM Rabat",
+		Specialite: "Data Science",
 	}
 
 	assistante := models.AssistanteChargeStage{
 		Nom:             "Laila",
 		Prenom:          "Bennani",
+		Identifiant:     "assistante1",
+		HashPassword:    "hashed_password2",
 		AdresseCourrier: "assistante@example.com",
 		NumTelephone:    "0600000000",
-		IDUtilisateur:   assistanteUser.ID,
 	}
 
 	DB.Create(&stagiaire)
