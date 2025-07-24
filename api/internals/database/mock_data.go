@@ -62,7 +62,6 @@ func SeedMockData() {
 		StatutDemande: "validee",
 		IDTheme:       theme.ID,
 		IDStagiaire:   stagiaire.ID,
-		IDParrain:     parrain.ID,
 	}
 	DB.Create(&demande)
 
@@ -70,6 +69,7 @@ func SeedMockData() {
 	stage := models.Stage{
 		StatutStage:    "en_cours",
 		DateValidation: func() *time.Time { t := time.Now(); return &t }(),
+		IDParrain:      parrain.ID,
 
 		IDAssistante:   assistante.ID,
 		IDDemandeStage: demande.ID,

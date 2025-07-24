@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"project-stage-pfa/internals/config"
-	"slices"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func RequireAuthMiddleware() gin.HandlerFunc {
@@ -36,26 +36,10 @@ func RequireAuthMiddleware() gin.HandlerFunc {
 		}
 		if token != nil && token.Valid {
 			userID := claims["id_utilisateur"]
-			role := claims["role"]
+
 			c.Set("id_utilisateur", userID)
-			c.Set("role", role)
 		}
 		c.Next()
 	}
 
-}
-func AuthorizedRolesMiddleware(roles ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		roleVal, ok := c.Get("role")
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": " role not found ."})
-		}
-
-		if slices.Contains(roles, roleVal.(string)) {
-			c.Next()
-		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unAuthorized role ."})
-		}
-	}
 }

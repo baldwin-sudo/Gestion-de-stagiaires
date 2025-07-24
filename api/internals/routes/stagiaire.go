@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"project-stage-pfa/internals/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func RegisterStagiaireRoutes(r *gin.Engine) {
@@ -17,7 +18,7 @@ func RegisterStagiaireRoutes(r *gin.Engine) {
 	stagiaire.POST("/:id/presence/:id_stage/today", handlers.MarquerStagiairePresentAujourdui())
 
 	// demande-stage
-	stagiaire.POST(":id/demande-stage", handlers.EnvoyerDemandeDeStage())
+	stagiaire.POST(":id/demande-stage")
 
 	// Nested group for routes that use a stagiaire ID
 }

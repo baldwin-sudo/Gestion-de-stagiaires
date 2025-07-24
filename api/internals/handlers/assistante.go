@@ -1,17 +1,18 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"project-stage-pfa/internals/database"
 	"project-stage-pfa/internals/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func TraiterDemande() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		type traitementRequest struct {
 			IsValider    bool   `json:"isValider"`
-			MotifDeRejet string `json:"MotifDeRejet,omitEmpty"`
+			MotifDeRejet string `json:"motifDeRejet,omitempty"`
 			IdEncadrant  uint   `json:"id_encadrant,omitempty"`
 		}
 		var traitementRes traitementRequest

@@ -14,11 +14,10 @@ import (
 
 type JwtCustomClaims struct {
 	idUtilisateur uint
-	role          string
 }
 
 func createJwt(jwtClaims JwtCustomClaims) (string, error) {
-	var token *jwt.Token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"id_utilisateur": jwtClaims.idUtilisateur, "role": jwtClaims.role})
+	var token *jwt.Token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"id_utilisateur": jwtClaims.idUtilisateur})
 	tokenString, err := token.SignedString([]byte(config.GetJwtSecret()))
 	if err != nil {
 		return "", err
@@ -31,7 +30,6 @@ func Login() gin.HandlerFunc {
 		type LoginRequest struct {
 			Identifiant string `form:"identifiant" binding:"required"`
 			MotDePasse  string `form:"motdepasse" binding:"required"`
-			Role        string `form:"role" binding:"required"`
 		}
 
 		var request LoginRequest
@@ -55,7 +53,6 @@ func Login() gin.HandlerFunc {
 
 		var tokenString, err = createJwt(JwtCustomClaims{
 			idUtilisateur: utilisateur.ID,
-			role:          "stagiaire",
 		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
