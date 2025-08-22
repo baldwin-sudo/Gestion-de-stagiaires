@@ -1,3 +1,5 @@
 api/data/**
 api/data/*
 *.db
+.idea/*
+.env

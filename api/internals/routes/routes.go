@@ -12,8 +12,10 @@ func RegisterRoutes(r *gin.Engine) {
 
 	RegisterParrainRoutes(r)
 
+	RegisterDemandesStageRoutes(r)
+
 	RegisterEncadrantRoutes(r)
-	
+
 	RegisterStageRoutes(r)
 
 	RegisterThemeDeStageRoutes(r)

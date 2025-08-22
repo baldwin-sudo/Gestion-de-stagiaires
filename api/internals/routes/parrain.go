@@ -10,6 +10,6 @@ func RegisterParrainRoutes(r *gin.Engine) {
 	parrainRoutes.GET("/", handlers.GetAllParrain())
 	parrainRoutes.GET("/:id", handlers.GetParrainByID())
 	parrainRoutes.POST("/", handlers.PostParrain())
-	parrainRoutes.PUT("/:id")
-
+	parrainRoutes.PUT("/:id", handlers.UpdateParrain())
+	parrainRoutes.DELETE("/:id", handlers.DeleteParrain())
 }

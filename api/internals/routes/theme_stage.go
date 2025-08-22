@@ -1,15 +1,16 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"project-stage-pfa/internals/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func RegisterThemeDeStageRoutes(r *gin.Engine) {
 	themedeStageRoutes := r.Group("/theme_stage")
-	themedeStageRoutes.GET("/", handlers.GetAllStages())
-	themedeStageRoutes.GET("/:id", handlers.GetStageById())
-	themedeStageRoutes.POST("/", handlers.CreateStage())
-	themedeStageRoutes.PUT("/:id", handlers.UpdateStage())
-
+	themedeStageRoutes.GET("/", handlers.GetAllThemeStages())
+	themedeStageRoutes.GET("/:id", handlers.GetThemeStageById())
+	themedeStageRoutes.POST("/", handlers.CreateThemeStage())
+	themedeStageRoutes.PUT("/:id", handlers.UpdateThemeStage())
+	themedeStageRoutes.DELETE("/:id", handlers.DeleteThemeStage())
 }

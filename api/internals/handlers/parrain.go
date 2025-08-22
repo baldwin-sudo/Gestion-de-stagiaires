@@ -56,3 +56,79 @@ func PostParrain() gin.HandlerFunc {
 		c.IndentedJSON(http.StatusCreated, gin.H{"parrain": parrain})
 	}
 }
+
+// UpdateParrain updates an existing parrain
+func UpdateParrain() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
+			return
+		}
+
+		type UpdateParrainRequest struct {
+			Nom         string `json:"nom"`
+			Prenom      string `json:"prenom"`
+			Departement string `json:"departement"`
+		}
+
+		var req UpdateParrainRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		var parrain models.ParrainDeStage
+		db := database.DB
+		if err := db.First(&parrain, id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Parrain introuvable"})
+			return
+		}
+
+		// Update fields if provided
+		if req.Nom != "" {
+			parrain.Nom = req.Nom
+		}
+		if req.Prenom != "" {
+			parrain.Prenom = req.Prenom
+		}
+		if req.Departement != "" {
+			parrain.Departement = req.Departement
+		}
+
+		if err := db.Save(&parrain).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"data": parrain})
+	}
+}
+
+// DeleteParrain deletes a parrain
+func DeleteParrain() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
+			return
+		}
+
+		var parrain models.ParrainDeStage
+		db := database.DB
+		
+		// Check if parrain exists
+		if err := db.First(&parrain, id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Parrain introuvable"})
+			return
+		}
+
+		// Delete the parrain
+		if err := db.Delete(&parrain).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Parrain supprimé avec succès"})
+	}
+}

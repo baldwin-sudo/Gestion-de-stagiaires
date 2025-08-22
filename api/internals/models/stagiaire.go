@@ -18,6 +18,8 @@ type Stagiaire struct {
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relations
+	Demandes []DemandeStage `gorm:"foreignKey:IDStagiaire" json:"demandes,omitempty"`
+	Presences []Presence    `gorm:"foreignKey:IDStagiaire" json:"presences,omitempty"`
 }
 
 func (Stagiaire) TableName() string {

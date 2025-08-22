@@ -2,15 +2,16 @@ package handlers
 
 import "C"
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"project-stage-pfa/internals/database"
 	"project-stage-pfa/internals/models"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
-func GetAllStages() gin.HandlerFunc {
+func GetAllThemeStages() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		db := database.DB
 		var themesStage []models.ThemeDeStage
@@ -18,7 +19,7 @@ func GetAllStages() gin.HandlerFunc {
 		c.IndentedJSON(http.StatusOK, gin.H{"data": themesStage})
 	}
 }
-func GetStageById() gin.HandlerFunc {
+func GetThemeStageById() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		db := database.DB
 		var themeStage models.ThemeDeStage
@@ -27,16 +28,11 @@ func GetStageById() gin.HandlerFunc {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		role, ok := c.Get("role")
-		if !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "role not found in context"})
-			return
-		}
-		c.IndentedJSON(http.StatusOK, gin.H{"data": themeStage, "role": role})
+		c.IndentedJSON(http.StatusOK, gin.H{"data": themeStage})
 	}
 }
 
-func CreateStage() gin.HandlerFunc {
+func CreateThemeStage() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		type CreateThemeStageRequest struct {
 			Sujet         string `form:"sujet" binding:"required"`
@@ -98,41 +94,113 @@ func CreateStage() gin.HandlerFunc {
 
 	}
 }
-func UpdateStage() gin.HandlerFunc {
+func UpdateThemeStage() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		type UpdateThemeStageRequest struct {
-			ID            *string `form:"id" binding:"required"`
-			Sujet         *string `form:"sujet" `
-			Departement   *string `form:"departement" `
-			Type          *string `form:"type" `
-			Description   *string `form:"description" `
-			Prerequisites *string `form:"prerequisites"`
-			Duree         *string `form:"duree" `
-		}
-		var updateRequest UpdateThemeStageRequest
-		if err := c.ShouldBind(&updateRequest); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
 			return
 		}
+
+		type UpdateThemeStageRequest struct {
+			Sujet         string `json:"sujet"`
+			Departement   string `json:"departement"`
+			Type          string `json:"type"`
+			Description   string `json:"description"`
+			Prerequisites string `json:"prerequisites"`
+			Duree         int    `json:"duree"`
+			IDEncadrant   uint   `json:"id_encadrant"`
+			DateDebut     string `json:"date_debut"`
+			DateFin       string `json:"date_fin"`
+		}
+
+		var req UpdateThemeStageRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
 		var themeStage models.ThemeDeStage
 		db := database.DB
-		// find the record
-		if result := db.First(&themeStage, updateRequest.ID); result.Error != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
+		
+		// Check if theme stage exists
+		if err := db.First(&themeStage, id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Thème de stage introuvable"})
 			return
 		}
-		// update the changed fields
-		if result := db.Model(&themeStage).Updates(updateRequest); result.Error != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
-			return
-		}
-		// refetch the updated record
-		if result := db.First(&themeStage, updateRequest.ID); result.Error != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
-			return
 
+		// Update fields if provided
+		if req.Sujet != "" {
+			themeStage.Sujet = req.Sujet
 		}
-		c.IndentedJSON(http.StatusOK, gin.H{"data": themeStage})
+		if req.Departement != "" {
+			themeStage.Departement = req.Departement
+		}
+		if req.Type != "" {
+			themeStage.Type = req.Type
+		}
+		if req.Description != "" {
+			themeStage.Description = req.Description
+		}
+		if req.Prerequisites != "" {
+			themeStage.Prerequisites = req.Prerequisites
+		}
+		if req.Duree != 0 {
+			themeStage.Duree = req.Duree
+		}
+		if req.IDEncadrant != 0 {
+			themeStage.IDEncadrant = req.IDEncadrant
+		}
+		if req.DateDebut != "" {
+			dateDebut, err := time.Parse("2006-01-02", req.DateDebut)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start date format. Use YYYY-MM-DD"})
+				return
+			}
+			themeStage.DateDebut = dateDebut
+		}
+		if req.DateFin != "" {
+			dateFin, err := time.Parse("2006-01-02", req.DateFin)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid finish date format. Use YYYY-MM-DD"})
+				return
+			}
+			themeStage.DateFin = dateFin
+		}
 
+		if err := db.Save(&themeStage).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"data": themeStage})
+	}
+}
+
+// DeleteThemeStage deletes a theme stage
+func DeleteThemeStage() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
+			return
+		}
+
+		var themeStage models.ThemeDeStage
+		db := database.DB
+		
+		// Check if theme stage exists
+		if err := db.First(&themeStage, id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Thème de stage introuvable"})
+			return
+		}
+
+		// Delete the theme stage
+		if err := db.Delete(&themeStage).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Thème de stage supprimé avec succès"})
 	}
 }

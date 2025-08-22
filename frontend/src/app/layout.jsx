@@ -4,8 +4,11 @@ import stageIcon from "@/assets/work.png";
 import offreIcon from "@/assets/archive.png";
 import stagiaireIcon from "@/assets/user.png";
 import staffIcon from "@/assets/staff.png";
+import logo from "@/assets/image.png";
 import NavItem from "@/components/NavItem";
 import "./globals.css";
+import Image from "next/image";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,22 +30,27 @@ export default function RootLayout({ children }) {
     {
       text: "Demandes",
       icon: demandeIcon,
+      link: "/demande",
     },
     {
       text: "Stages",
       icon: stageIcon,
+      link: "/stage",
     },
     {
       text: "Offres",
       icon: offreIcon,
+      link: "/offre",
     },
     {
       text: "Stagiaires",
       icon: stagiaireIcon,
+      link: "/stagiaire",
     },
     {
       text: "Staff",
       icon: staffIcon,
+      link: "/staff",
     },
   ];
   return (
@@ -51,17 +59,38 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}
       >
         {/* main container */}
-        <div className="flex flex-row">
-          {/* sidebar */}
-          <div className="h-screen w-64 bg-blue-800 ">
-            <h1 className="h-32 w-32 bg-white pl">logo</h1>
-            <div className="mt-10">
-              {navItems.map((item, idx) => {
-                return <NavItem item={item} key={idx} />;
-              })}
+        <div className="flex h-screen overflow-hidden">
+          {/* sidebar - fixed height and scrollable */}
+          <div className="w-64 bg-blue-800 flex flex-col flex-shrink-0">
+            <div className="flex flex-col h-full">
+              {/* Logo section */}
+              <div className="p-6">
+                <Link href="/" className="block">
+                  <Image
+                    className="mx-auto rounded-lg p-1 bg-white hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+                    src={logo}
+                    alt="logo"
+                    width="150"
+                    height="150"
+                  />
+                </Link>
+              </div>
+              
+              {/* Navigation section - scrollable if needed */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="px-4 pb-4">
+                  {navItems.map((item, idx) => {
+                    return <NavItem item={item} key={idx} />;
+                  })}
+                </div>
+              </div>
             </div>
           </div>
-          {children}
+          
+          {/* Main content area - scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            {children}
+          </div>
         </div>
       </body>
     </html>
